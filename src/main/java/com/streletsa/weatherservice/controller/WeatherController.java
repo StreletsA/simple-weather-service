@@ -2,24 +2,25 @@ package com.streletsa.weatherservice.controller;
 
 import com.streletsa.weatherservice.entity.Weather;
 import com.streletsa.weatherservice.service.WeatherService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
-@RestController()
+@RestController
+@RequestMapping(path = "/weather")
+@RequiredArgsConstructor
 public class WeatherController {
+    private final WeatherService weatherService;
 
-    @Autowired
-    private WeatherService weatherService;
-
-    @GetMapping("/weather")
-    public ResponseEntity<Weather> getCurrentWeather(){
+    @GetMapping
+    public ResponseEntity<Weather> getCurrentWeather() throws IOException {
 
         Optional<Weather> weatherOptional = weatherService.getCurrentWeather();
 
@@ -27,7 +28,7 @@ public class WeatherController {
                               .orElseGet(() -> new ResponseEntity<>(null, HttpStatus.EXPECTATION_FAILED));
     }
 
-    @GetMapping("/weather/history")
+    @GetMapping("/history")
     public List<Weather> getWeatherHistory(){
         return weatherService.getWeatherHistory();
     }

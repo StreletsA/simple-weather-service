@@ -5,13 +5,18 @@ import lombok.Setter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-@Document(collection = "weather_history")
 @Getter
 @Setter
+@Document(collection = "weather_history")
 public class Weather {
-
+    /**
+     * Дата представления погоды
+     */
     @Id
     String weatherDate;
-    String weatherValue;
 
+    /**
+     * Температура в градусах цельсия
+     */
+    String weatherValue;
 }
