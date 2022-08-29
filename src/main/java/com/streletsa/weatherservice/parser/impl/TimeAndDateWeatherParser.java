@@ -1,6 +1,10 @@
-package com.streletsa.weatherservice.service.parser;
+package com.streletsa.weatherservice.parser.impl;
 
 import com.streletsa.weatherservice.entity.Weather;
+import com.streletsa.weatherservice.error.WebResourceWeatherGettingException;
+import com.streletsa.weatherservice.parser.WeatherParser;
+import com.streletsa.weatherservice.parser.WebResource;
+import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -15,21 +19,29 @@ import java.util.Optional;
 /**
  * Сервис по получению погоды с ресурса 'www.timeanddate.com'
  */
-@Service
+@Component
 public class TimeAndDateWeatherParser implements WeatherParser {
-    private static final String URL = "https://www.timeanddate.com/weather/russia/moscow";
+    private static final WebResource WEB_RESOURCE = WebResource.TIME_AND_DATE;
     private static final String START_CHAR_SEQUENCE = "h2";
     private static final Character STOP_CHAR = '&';
 
     @Override
-    public Optional<Weather> parseCurrentWeather() throws IOException {
+    public Optional<Weather> parseCurrentWeather() {
         Weather weather = new Weather();
 
-        weather.setWeatherDate(LocalDate.now().toString());
-        weather.setWeatherValue(getWeatherValue());
+        try {
+            weather.setWeatherDate(LocalDate.now().toString());
+            weather.setWeatherValue(getWeatherValue());
+        } catch (IOException e) {
+            throw new WebResourceWeatherGettingException();
+        }
 
         return Optional.of(weather);
+    }
 
+    @Override
+    public WebResource getWebResource() {
+        return WEB_RESOURCE;
     }
 
     private String getWeatherValue() throws IOException {
@@ -39,7 +51,9 @@ public class TimeAndDateWeatherParser implements WeatherParser {
     }
 
     private String getContent() throws IOException {
-        URLConnection connection = new URL(URL).openConnection();
+        final String url = WEB_RESOURCE.getUrl();
+
+        URLConnection connection = new URL(url).openConnection();
 
         return getContentFromInputStream(connection.getInputStream());
     }

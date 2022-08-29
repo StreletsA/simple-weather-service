@@ -1,40 +1,28 @@
 package com.streletsa.weatherservice.service;
 
 import com.streletsa.weatherservice.entity.Weather;
-import com.streletsa.weatherservice.repository.WeatherRepository;
-import com.streletsa.weatherservice.service.parser.WeatherParser;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-@Service
-@RequiredArgsConstructor
-public class WeatherService {
-    private final WeatherRepository weatherRepository;
-    private final WeatherParser weatherParser;
+/**
+ * Сервис по работе с погодой
+ */
+public interface WeatherService {
+    /**
+     * Метод для получения актуальной погоды из хранилища или веб-ресурса - при отсутствии в хранилище
+     *
+     * @return актуальная погода
+     *
+     * @throws IOException при ошибке получения погоды
+     */
+    Optional<Weather> getCurrentWeather() throws IOException;
 
-
-    public Optional<Weather> getCurrentWeather() throws IOException {
-
-        Optional<Weather> weatherOptional = weatherRepository.findById(LocalDate.now().toString());
-
-        if (weatherOptional.isPresent())
-            return weatherOptional;
-
-        weatherOptional = weatherParser.parseCurrentWeather();
-        weatherOptional.ifPresent(weatherRepository::save);
-
-        return weatherOptional;
-
-    }
-
-    public List<Weather> getWeatherHistory(){
-        return weatherRepository.findAll();
-    }
-
+    /**
+     * Получение истории наблюдения за погодой
+     *
+     * @return список погоды для всех наблюдаемых дней
+     */
+    List<Weather> getWeatherHistory();
 }
